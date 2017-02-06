@@ -27,6 +27,10 @@ void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-	// ...
+    FVector PlayerLocation;
+    FRotator PlayerRotation;
+    GetWorld()->GetFirstPlayerController()->AController::GetPlayerViewPoint(PlayerLocation, PlayerRotation);
+    
+    UE_LOG(LogTemp, Warning, TEXT("Rot: %s - Pos: (%0.2f, %0.2f)"), *PlayerRotation.ToString(), *PlayerLocation.ToString());
 }
 
