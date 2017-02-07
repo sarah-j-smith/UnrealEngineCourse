@@ -31,6 +31,10 @@ void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
     FRotator PlayerRotation;
     GetWorld()->GetFirstPlayerController()->AController::GetPlayerViewPoint(PlayerLocation, PlayerRotation);
     
-    UE_LOG(LogTemp, Warning, TEXT("Rot: %s - Pos: (%0.2f, %0.2f)"), *PlayerRotation.ToString(), *PlayerLocation.ToString());
+//    UE_LOG(LogTemp, Warning, TEXT("Rot: %s - Pos: (%0.2f, %0.2f)"), *PlayerRotation.ToString(), *PlayerLocation.ToString());
+    
+    FVector ReachVector = PlayerLocation + PlayerRotation.Vector() * ReachDistance;
+    
+    DrawDebugLine(GetWorld(), PlayerLocation, ReachVector, FColor(255, 0, 0), false, 0, 0, 10.0f);
 }
 
