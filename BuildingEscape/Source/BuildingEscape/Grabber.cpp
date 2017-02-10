@@ -18,7 +18,16 @@ void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
     
-    UE_LOG(LogTemp, Warning, TEXT("Grabber commencify"));
+    PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+    
+    if (PhysicsHandle == nullptr)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Grabber requires %s must have PhysicsHandle attached."), *GetOwner()->GetName());
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Grabber good to go"));        
+    }
 }
 
 

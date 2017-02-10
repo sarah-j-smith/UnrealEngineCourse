@@ -24,4 +24,6 @@ public:
 private:
     UPROPERTY(EditAnywhere)
     float ReachDistance = 50.0;
+    
+    UPhysicsHandleComponent *PhysicsHandle = nullptr;
 };
