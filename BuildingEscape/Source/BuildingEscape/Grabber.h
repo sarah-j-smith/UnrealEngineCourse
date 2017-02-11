@@ -20,10 +20,20 @@ public:
 	
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
+    
+    // Grab the object currently pointed at within reach.
+    void Grab();
+    
+    // Release the currently grabbed object
+    void Release();
 
 private:
     UPROPERTY(EditAnywhere)
     float ReachDistance = 50.0;
     
     UPhysicsHandleComponent *PhysicsHandle = nullptr;
+    
+    UInputComponent *InputComponent = nullptr;
+    
+    AActor *GrabbedOjbect = nullptr;
 };
