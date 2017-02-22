@@ -28,8 +28,18 @@ public:
     void Release();
 
 private:
+    
+    void SetUpPhysicsHandle();
+    void SetUpInputComponent();
+    
+    void RenderDebugLine() const;
+    FVector FindReachVector() const;
+    FVector FindPlayerLocation() const;
+    FRotator FindPlayerRotation() const;
+    FHitResult GetHitResult() const;
+    
     UPROPERTY(EditAnywhere)
-    float ReachDistance = 50.0;
+    float ReachDistance = 150.0;
     
     UPhysicsHandleComponent *PhysicsHandle = nullptr;
     

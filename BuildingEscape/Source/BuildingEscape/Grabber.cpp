@@ -12,25 +12,38 @@ UGrabber::UGrabber()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
 // Called when the game starts
 void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
-    
+
+    SetUpPhysicsHandle();
+    SetUpInputComponent();
+
+    if (PhysicsHandle && InputComponent)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Grabber good to go"));
+    }
+}
+
+void UGrabber::SetUpPhysicsHandle()
+{
     PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
-    InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
     if (PhysicsHandle == nullptr)
     {
         UE_LOG(LogTemp, Error, TEXT("Grabber requires %s must have PhysicsHandle attached."), *GetOwner()->GetName());
     }
-    else if (InputComponent == nullptr)
+}
+
+void UGrabber::SetUpInputComponent()
+{
+    InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+    if (InputComponent == nullptr)
     {
         UE_LOG(LogTemp, Error, TEXT("Grabber requires %s must have InputComponent attached."), *GetOwner()->GetName());
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("Grabber good to go"));
         InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
         InputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
     }
@@ -42,37 +55,86 @@ void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
+    RenderDebugLine();
     
-//    UE_LOG(LogTemp, Warning, TEXT("Rot: %s - Pos: (%0.2f, %0.2f)"), *PlayerRotation.ToString(), *PlayerLocation.ToString());
-    
+    if (PhysicsHandle->GrabbedComponent != nullptr)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Moving grabbed object"));
+        PhysicsHandle->SetTargetLocation(FindReachVector());
+    }
+}
+
+FVector UGrabber::FindReachVector() const
+{
+    FRotator PlayerRotation = FindPlayerRotation();
+    FVector ReachVector = FindPlayerLocation() + PlayerRotation.Vector() * ReachDistance;
+    return ReachVector;
+}
+
+FVector UGrabber::FindPlayerLocation() const
+{
+    FVector PlayerLocation;
+    FRotator PlayerRotation;
+    GetWorld()->GetFirstPlayerController()->AController::GetPlayerViewPoint(PlayerLocation, PlayerRotation);
+    return PlayerLocation;
+}
+
+FRotator UGrabber::FindPlayerRotation() const
+{
+    FVector PlayerLocation;
+    FRotator PlayerRotation;
+    GetWorld()->GetFirstPlayerController()->AController::GetPlayerViewPoint(PlayerLocation, PlayerRotation);
+    return PlayerRotation;
+}
+
+void UGrabber::RenderDebugLine() const
+{
+    DrawDebugLine(GetWorld(), FindPlayerLocation(), FindReachVector(), FColor::Red, false, 0, 0, 10.0f);
+}
+
+FHitResult UGrabber::GetHitResult() const
+{
+    FHitResult OutHitResult;
+    FCollisionObjectQueryParams ObjectQueryParams = FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody);
+    FCollisionQueryParams QueryParams = FCollisionQueryParams(FName(TEXT("")), false, GetOwner());
+    GetWorld()->LineTraceSingleByObjectType(OUT OutHitResult, FindPlayerLocation(), FindReachVector(), ObjectQueryParams, QueryParams);
+    return OutHitResult;
 }
 
 void UGrabber::Grab()
 {
     UE_LOG(LogTemp, Warning, TEXT("Grabber activated %s"), *GetOwner()->GetName());
     
-    FVector PlayerLocation;
-    FRotator PlayerRotation;
-    GetWorld()->GetFirstPlayerController()->AController::GetPlayerViewPoint(PlayerLocation, PlayerRotation);
-    FVector ReachVector = PlayerLocation + PlayerRotation.Vector() * ReachDistance;
-    
-    //    DrawDebugLine(GetWorld(), PlayerLocation, ReachVector, FColor(255, 0, 0), false, 0, 0, 10.0f);
-    FHitResult OutHitResult;
-    FCollisionObjectQueryParams ObjectQueryParams = FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody);
-    FCollisionQueryParams QueryParams = FCollisionQueryParams(FName(TEXT("")), false, GetOwner());
-    GetWorld()->LineTraceSingleByObjectType(OUT OutHitResult, PlayerLocation, ReachVector, ObjectQueryParams, QueryParams);
-    
+    FHitResult OutHitResult = GetHitResult();
     AActor *Target = OutHitResult.GetActor();
     if (Target)
     {
         UE_LOG(LogTemp, Warning, TEXT("Hit object: %s"), *Target->GetName());
         GrabbedOjbect = Target;
+        
+        UPrimitiveComponent *ComponentToGrab = OutHitResult.GetComponent();
+        if (ComponentToGrab != nullptr)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Grabbed object: %s"), *Target->GetName());
+            PhysicsHandle->GrabComponentAtLocationWithRotation(ComponentToGrab, NAME_None, ComponentToGrab->GetOwner()->GetActorLocation(), ComponentToGrab->GetOwner()->GetActorRotation());
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Hit object had no component"), *Target->GetName());
+        }
     }
 }
 
 void UGrabber::Release()
 {
-    UE_LOG(LogTemp, Warning, TEXT("%s released"), *GrabbedOjbect->GetName());
-    GrabbedOjbect = nullptr;
+    if (GrabbedOjbect != nullptr && GrabbedOjbect->GetName() != nullptr)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("%s released"), *GrabbedOjbect->GetName());
+        GrabbedOjbect = nullptr;
+        if (PhysicsHandle->GrabbedComponent != nullptr)
+        {
+            PhysicsHandle->ReleaseComponent();
+        }
+    }
 }
 
