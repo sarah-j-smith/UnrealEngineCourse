@@ -7,7 +7,7 @@ help.  I'm having a lot of fun with it, and enjoying the fact that it uses C++ i
 an over-reliance on BluePrints.  I think that BluePrints are great, but there are far too
 many very complex BluePrints out there...'
 
-![Screen shot](Setting-Phyics-On.png)
+![Screen shot](Setting-Physics-On.png)
 
 Here's my review of the course:
 
