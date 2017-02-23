@@ -33,6 +33,9 @@ private:
     
     UPROPERTY(EditAnywhere)
     float DoorCloseDelay = 1.0f;
+    
+    UPROPERTY(EditAnywhere)
+    float TriggerMassThreshold = 50.0f;
 	
     float ClosedAngle = 0.0;
     
