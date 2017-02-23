@@ -19,7 +19,6 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
     
-    ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
     Owner = GetOwner();
     FRotator rotation = Owner->GetActorRotation();
     ClosedAngle = rotation.Yaw;
@@ -40,7 +39,7 @@ void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-    if (PressurePlate->IsOverlappingActor(ActorThatOpens))
+    if (GetTotalMassOnPlate() > 50.0f)  // TODO: make configurable
     {
         OpenDoor();
         LastOpenTime = GetWorld()->GetTimeSeconds();
@@ -53,3 +52,7 @@ void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompo
     
 }
 
+float UOpenDoor::GetTotalMassOnPlate() const
+{
+    return 60.0f;
+}

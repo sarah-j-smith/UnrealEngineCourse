@@ -36,8 +36,9 @@ private:
 	
     float ClosedAngle = 0.0;
     
-    AActor *ActorThatOpens;
     AActor *Owner;
     double LastOpenTime = 0.0;
+    
+    float GetTotalMassOnPlate() const;
 };
 
