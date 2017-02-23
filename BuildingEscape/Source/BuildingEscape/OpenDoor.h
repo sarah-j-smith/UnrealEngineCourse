@@ -12,11 +12,6 @@ class BUILDINGESCAPE_API UOpenDoor : public UActorComponent
 
 public:
     
-    enum class OpenableStatus {
-        Opened = 0,
-        Closed = 1
-    };
-    
 	// Sets default values for this component's properties
 	UOpenDoor();
 
@@ -44,7 +39,5 @@ private:
     AActor *ActorThatOpens;
     AActor *Owner;
     double LastOpenTime = 0.0;
-    
-    OpenableStatus status;
 };
 

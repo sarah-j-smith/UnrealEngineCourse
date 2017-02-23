@@ -19,11 +19,6 @@ void UGrabber::BeginPlay()
 
     SetUpPhysicsHandle();
     SetUpInputComponent();
-
-    if (PhysicsHandle && InputComponent)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Grabber good to go"));
-    }
 }
 
 void UGrabber::SetUpPhysicsHandle()
@@ -59,7 +54,6 @@ void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
     
     if (PhysicsHandle->GrabbedComponent != nullptr)
     {
-        UE_LOG(LogTemp, Warning, TEXT("Moving grabbed object"));
         PhysicsHandle->SetTargetLocation(FindReachVector());
     }
 }
@@ -103,24 +97,16 @@ FHitResult UGrabber::GetHitResult() const
 
 void UGrabber::Grab()
 {
-    UE_LOG(LogTemp, Warning, TEXT("Grabber activated %s"), *GetOwner()->GetName());
-    
     FHitResult OutHitResult = GetHitResult();
     AActor *Target = OutHitResult.GetActor();
     if (Target)
     {
-        UE_LOG(LogTemp, Warning, TEXT("Hit object: %s"), *Target->GetName());
         GrabbedOjbect = Target;
         
         UPrimitiveComponent *ComponentToGrab = OutHitResult.GetComponent();
         if (ComponentToGrab != nullptr)
         {
-            UE_LOG(LogTemp, Warning, TEXT("Grabbed object: %s"), *Target->GetName());
             PhysicsHandle->GrabComponentAtLocationWithRotation(ComponentToGrab, NAME_None, ComponentToGrab->GetOwner()->GetActorLocation(), ComponentToGrab->GetOwner()->GetActorRotation());
-        }
-        else
-        {
-            UE_LOG(LogTemp, Warning, TEXT("Hit object had no component"), *Target->GetName());
         }
     }
 }
@@ -129,7 +115,6 @@ void UGrabber::Release()
 {
     if (GrabbedOjbect != nullptr && GrabbedOjbect->GetName() != nullptr)
     {
-        UE_LOG(LogTemp, Warning, TEXT("%s released"), *GrabbedOjbect->GetName());
         GrabbedOjbect = nullptr;
         if (PhysicsHandle->GrabbedComponent != nullptr)
         {

@@ -23,21 +23,16 @@ void UOpenDoor::BeginPlay()
     Owner = GetOwner();
     FRotator rotation = Owner->GetActorRotation();
     ClosedAngle = rotation.Yaw;
-    status = OpenableStatus::Closed;
-    
-    UE_LOG(LogTemp, Warning, TEXT("Captured closed angle %0.2f"), ClosedAngle);
 }
 
 void UOpenDoor::OpenDoor()
 {
     Owner->SetActorRotation(FRotator(0.0f, OpenAngle, 0.0f));
-    status = OpenableStatus::Opened;
 }
 
 void UOpenDoor::CloseDoor()
 {
     Owner->SetActorRotation(FRotator(0.0f, ClosedAngle, 0.0f));
-    status = OpenableStatus::Closed;
 }
 
 // Called every frame
@@ -45,16 +40,14 @@ void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-    if (PressurePlate->IsOverlappingActor(ActorThatOpens)) // && status == OpenableStatus::Closed)
+    if (PressurePlate->IsOverlappingActor(ActorThatOpens))
     {
-//        UE_LOG(LogTemp, Warning, TEXT("Opening door %s due to pressure plate %s"), *GetOwner()->GetName(), *PressurePlate->GetName());
         OpenDoor();
         LastOpenTime = GetWorld()->GetTimeSeconds();
     }
     
-    if ((GetWorld()->GetTimeSeconds() - LastOpenTime) >= DoorCloseDelay) // && status == OpenableStatus::Opened)
+    if ((GetWorld()->GetTimeSeconds() - LastOpenTime) >= DoorCloseDelay)
     {
-//        UE_LOG(LogTemp, Warning, TEXT("Closing door after %0.2f seconds"), DoorCloseDelay);
         CloseDoor();
     }
     
