@@ -69,7 +69,7 @@ FVector UGrabber::FindPlayerLocation() const
 {
     FVector PlayerLocation;
     FRotator PlayerRotation;
-    GetWorld()->GetFirstPlayerController()->AController::GetPlayerViewPoint(PlayerLocation, PlayerRotation);
+    GetWorld()->GetFirstPlayerController()->AController::GetPlayerViewPoint(OUT PlayerLocation, OUT PlayerRotation);
     return PlayerLocation;
 }
 
@@ -77,7 +77,7 @@ FRotator UGrabber::FindPlayerRotation() const
 {
     FVector PlayerLocation;
     FRotator PlayerRotation;
-    GetWorld()->GetFirstPlayerController()->AController::GetPlayerViewPoint(PlayerLocation, PlayerRotation);
+    GetWorld()->GetFirstPlayerController()->AController::GetPlayerViewPoint(OUT PlayerLocation, OUT PlayerRotation);
     return PlayerRotation;
 }
 
